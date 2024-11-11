@@ -19,7 +19,7 @@ git clone https://github.com/bphamho/droneshield-qa-task2.git
 2. Navigate to the repository with
 
 ```bash
-cd droneshield-qa-task
+cd droneshield-qa-task2
 ```
 
 3. Create and activate virtual environment
