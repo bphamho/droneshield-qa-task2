@@ -63,6 +63,7 @@ def test_delete_pet(pet_data):
     # Verify pet doesn't exist
     response = requests.get(f"{URL}/pet/{pet_id}", timeout=10)
     assert response.status_code == 404
+
 def test_find_pets_by_status(pet_data):
     """Test to find pets by different status's"""
     # First create pets with different statuses (available, pending, sold)
@@ -122,6 +123,30 @@ def test_special_characters(pet_data):
         response = requests.post(f"{URL}/pet", json=new_pet, timeout=10)
 
         assert response.status_code in {200, 201}
+
+def test_update_pet_form(pet_data):
+    """Test updating a pet with form data"""
+    
+    # Create pet
+    new_pet = pet_data.copy()
+    new_pet["id"] = 678
+    
+    new_data = {
+        "name" : "NewName",
+        "status": "sold"
+    }
+    response = requests.post(f"{URL}/pet", json=new_pet)
+    assert response.status_code == 200
+    
+    # Update pet with form data
+    response = requests.post(f"{URL}/pet/{new_pet["id"]}", data=new_data)
+    assert response.status_code == 200
+    
+    # Verify pet new data
+    response = requests.get(f"{URL}/pet/{new_pet["id"]}", timeout=10)
+    assert response.status_code == 200
+    assert response.json()["name"] == new_data["name"]
+    assert response.json()["status"] == new_data["status"]
 
 def test_flow():
     """Test a start to finish creation, get, update, get and deletion of a pet"""
@@ -223,7 +248,7 @@ def test_invalid_http_method():
     assert response.status_code == 405
 
 def create_pet_concurrently(test_pet_data, num_requests=10):
-    """Test creating pets concurrently to check for race conditions or resource conflicts."""
+    """Function to create pets concurrently to check for race conditions or resource conflicts."""
     
     def create_pet():
         response = requests.post(f"{URL}/pet", json=test_pet_data)
